@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TERMINAL</title>
+    <title>KINZOKU LABS // TERMINAL</title>
     <style>
         :root {
-            /* Classic Phosphor Amber Palette */
             --bg-color: #080500;
             --amber-main: #ffb000;
             --amber-dim: #a67200;
-            --amber-glow: rgba(255, 176, 0, 0.4);
+            --amber-glow: rgba(255, 176, 0, 0.35);
             --ok-green: #55ff55;
-            --ok-glow: rgba(85, 255, 85, 0.4);
+            --ok-glow: rgba(85, 255, 85, 0.35);
+            --alert-red: #ff3333;
             --font-stack: 'Courier New', Courier, Monaco, 'SF Mono', monospace;
         }
 
@@ -35,18 +35,18 @@
             position: relative;
         }
 
-        /* Ambient Amber Tube Glow */
+        /* Ambient CRT Tube Glow */
         body::before {
             content: " ";
             display: block;
             position: fixed;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: radial-gradient(circle at 50% 50%, rgba(255, 176, 0, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+            background: radial-gradient(circle at 50% 50%, rgba(255, 176, 0, 0.04) 0%, rgba(0, 0, 0, 0.85) 100%);
             pointer-events: none;
             z-index: 1;
         }
 
-        /* CRT Scanline Overlay Effect */
+        /* Scanline Overlay */
         body::after {
             content: " ";
             display: block;
@@ -54,7 +54,7 @@
             top: 0; left: 0; bottom: 0; right: 0;
             background: linear-gradient(
                 rgba(18, 16, 16, 0) 50%, 
-                rgba(0, 0, 0, 0.35) 50%
+                rgba(0, 0, 0, 0.3) 50%
             );
             background-size: 100% 4px;
             pointer-events: none;
@@ -69,27 +69,49 @@
             margin: 0 auto;
         }
 
-        /* Amber Text with Glow Effect */
         .glow-text {
             color: var(--amber-main);
             text-shadow: 
                 0 0 2px var(--amber-main),
-                0 0 8px var(--amber-glow);
+                0 0 6px var(--amber-glow);
             line-height: 1.5;
-            font-size: 1rem;
+            font-size: 0.92rem;
             letter-spacing: 0.5px;
         }
 
-        /* --- Boot Log Styles --- */
-        #boot-container {
-            display: block;
+        #audio-prompt {
+            color: var(--alert-red);
+            background: rgba(255, 51, 51, 0.1);
+            border: 1px dashed var(--alert-red);
+            padding: 10px 14px;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            user-select: none;
+            text-align: center;
+            transition: all 0.2s ease;
+            animation: pulse-border 1.5s infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        #audio-prompt.unlocked {
+            color: var(--ok-green);
+            background: rgba(85, 255, 85, 0.08);
+            border-color: var(--ok-green);
+            animation: none;
         }
 
         .boot-log {
             display: flex;
             flex-direction: column;
-            gap: 2px;
-            font-size: 0.9rem;
+            gap: 3px;
+            font-size: 0.85rem;
+            padding-bottom: 40px;
         }
 
         .log-line {
@@ -108,37 +130,53 @@
             margin-right: 8px;
         }
 
-        /* --- Main Terminal Content Styles --- */
         #main-terminal {
-            display: none; /* Hidden until boot finishes */
+            display: none;
         }
 
         .header-block {
             margin-bottom: 24px;
             border-bottom: 1px dashed var(--amber-dim);
-            padding-bottom: 12px;
+            padding-bottom: 16px;
         }
 
         .title {
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             font-weight: bold;
-            margin-bottom: 8px;
-            letter-spacing: 2px;
+            margin-bottom: 6px;
+            letter-spacing: 2.5px;
         }
 
         .sub-title {
             color: var(--amber-dim);
-            font-size: 0.85rem;
+            font-size: 0.88rem;
+            letter-spacing: 1px;
         }
 
         .content-block {
-            margin-bottom: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .description {
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .tagline {
+            color: var(--amber-dim);
+            font-size: 0.88rem;
+            font-style: italic;
         }
 
         .prompt-line {
             display: flex;
             align-items: center;
-            margin-top: 20px;
+            margin-top: 24px;
+            border-top: 1px dashed var(--amber-dim);
+            padding-top: 16px;
         }
 
         .prompt-symbol {
@@ -146,17 +184,15 @@
             color: var(--amber-main);
         }
 
-        /* Animated Flashing Terminal Cursor */
         .cursor {
             display: inline-block;
-            width: 100px;
+            width: 10px;
             height: 1.2em;
             background-color: var(--amber-main);
             box-shadow: 0 0 8px var(--amber-glow);
             vertical-align: middle;
             margin-left: 4px;
             animation: blink 1s infinite;
-            width: 10px;
         }
 
         @keyframes blink {
@@ -167,21 +203,20 @@
 </head>
 <body>
 
-    <!-- SECTION 1: BOOT LOG -->
     <div id="boot-container" class="terminal-container glow-text">
+        <div id="audio-prompt">[ CLICK HERE TO UNLOCK AUDIO RELAYS & HEARING SOUNDS ]</div>
         <div id="boot-log" class="boot-log"></div>
     </div>
 
-    <!-- SECTION 2: MAIN TERMINAL -->
     <div id="main-terminal" class="terminal-container glow-text">
         <div class="header-block">
-            <div class="title">SYSTEM TERMINAL v1.0</div>
-            <div class="sub-title">STATUS: READY // ALL SYSTEMS NOMINAL</div>
+            <div class="title">KINZOKU LABS</div>
+            <div class="sub-title">STATUS: SYSTEM ONLINE // ARCHIVE ACCESS GRANTED</div>
         </div>
 
         <div class="content-block">
-            <p>> INITIALIZING DISPLAY INTERFACE...</p>
-            <p>> AMBER PHOSPHOR RENDERER ONLINE.</p>
+            <p class="description">> SPECIALIZING IN CUSTOM CIRCUIT BOARD JEWELRY AND HARDWARE ACCESSORIES.</p>
+            <p class="tagline">// PRECISION PCB FABRICATION. HARDWARE AS ART.</p>
         </div>
 
         <div class="prompt-line">
@@ -192,58 +227,178 @@
     </div>
 
     <script>
-        (function() {
-            const bootMessages = [
-                { time: "0.000000", text: "Linux version 6.1.0-custom-amber (gcc v12.2.0) #1 SMP PREEMPT" },
-                { time: "0.004120", text: "BIOS-provided physical RAM map:" },
-                { time: "0.004155", text: " BIOS-e820: [mem 0x0000000000000000-0x000000000009edff] usable" },
-                { time: "0.012401", text: "Console: colour dummy device 80x25" },
-                { time: "0.028910", text: "printk: console [tty0] enabled" },
-                { time: "0.089304", text: "Memory: 16384K/65536K available" },
-                { status: "OK", text: "Started Kernel Device Manager." },
-                { status: "OK", text: "Loaded CRT Display Driver [amber_crt.ko]." },
-                { status: "OK", text: "Activated Scanline Overlay Hardware Renderer." },
-                { status: "OK", text: "Mounted Root File System." },
-                { status: "OK", text: "Initialized Terminal Subsystem Interface." },
-                { status: "OK", text: "Reached target System Initialization." },
-                { status: "OK", text: "Launching Primary Interface..." }
-            ];
+        const bootStartTime = performance.now();
 
-            const logContainer = document.getElementById("boot-log");
-            const bootContainer = document.getElementById("boot-container");
-            const mainTerminal = document.getElementById("main-terminal");
+        function getRealSeconds() {
+            const elapsed = performance.now() - bootStartTime;
+            return (elapsed / 1000).toFixed(6);
+        }
 
-            let index = 0;
+        // --- AUDIBLE TACTILE MECHANICAL CLICK SYNTHESIZER ---
+        let audioCtx = null;
 
-            function printNextLine() {
-                if (index < bootMessages.length) {
-                    const msg = bootMessages[index];
-                    const lineDiv = document.createElement("div");
-                    lineDiv.className = "log-line";
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioCtx = new AudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            
+            const promptEl = document.getElementById("audio-prompt");
+            if (promptEl) {
+                promptEl.classList.add("unlocked");
+                promptEl.innerHTML = "[ AUDIO RELAYS ONLINE // TACTILE CLICK ENGINE ACTIVE ]";
+            }
+        }
 
-                    if (msg.status) {
-                        lineDiv.innerHTML = `[ <span class="status-ok">${msg.status}</span> ] ${msg.text}`;
-                    } else {
-                        lineDiv.innerHTML = `<span class="timestamp">[${msg.time}]</span> ${msg.text}`;
-                    }
+        // Tactile micro-burst click engine
+        function playWordClick() {
+            if (!audioCtx || audioCtx.state !== 'running') return;
 
-                    logContainer.appendChild(lineDiv);
-                    index++;
+            const now = audioCtx.currentTime;
 
-                    // 40ms delay per line
-                    setTimeout(printNextLine, 40);
-                } else {
-                    // Switch views after boot finishes
-                    setTimeout(function() {
-                        bootContainer.style.display = "none";
-                        mainTerminal.style.display = "block";
-                    }, 400);
-                }
+            // Generate noise burst for realistic relay impact
+            const bufferSize = audioCtx.sampleRate * 0.008; // 8ms transient
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
             }
 
-            // Execute immediately on script load
-            printNextLine();
-        })();
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+
+            // Filter the noise to sound like a solid plastic key housing strike
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(1800 + (Math.random() * 200 - 100), now);
+            filter.Q.setValueAtTime(3.0, now);
+
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.008);
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            noise.start(now);
+        }
+
+        function playBootBeep() {
+            if (!audioCtx || audioCtx.state !== 'running') return;
+
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, now);
+            gain.gain.setValueAtTime(0.04, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.12);
+        }
+
+        window.addEventListener('click', initAudio);
+        window.addEventListener('keydown', initAudio);
+
+        // --- REALISTIC WEBSITE BOOT LOG ---
+        const siteBootMessages = [
+            { isOk: false, text: "KINZOKU LABS ARCHIVE SYSTEM v1.0.4" },
+            { isOk: false, text: "Initializing HTTP/2 Network Session Layer..." },
+            { isOk: true,  text: "DNS Lookup Resolved: kinzokulabs.com -> 127.0.0.1" },
+            { isOk: true,  text: "TLS 1.3 Handshake Completed [ECDHE-RSA-AES128-GCM-SHA256]" },
+            { isOk: false, text: "Allocating User Agent Viewport Bounds..." },
+            { isOk: true,  text: "Viewport Initialized: Device Pixel Ratio [1.0x]" },
+            { isOk: false, text: "Parsing HTML5 Document Markup Tree..." },
+            { isOk: true,  text: "DOM Node Allocation Complete [body, #boot-container, #main-terminal]" },
+            { isOk: false, text: "Compiling Cascading Style Sheets (CSSOM)..." },
+            { isOk: true,  text: "Root CSS Custom Variables Extracted (--amber-main, --amber-glow)" },
+            { isOk: true,  text: "Applying CRT Scanline Fragment Shader Layer" },
+            { isOk: true,  text: "Applying Phosphor Tube Radial Glow Gradient" },
+            { isOk: false, text: "Auditing System Typography Stack..." },
+            { isOk: true,  text: "Fixed-Width Monospace Font Engine Active [Courier New Fallback]" },
+            { isOk: false, text: "Initializing Web Audio API AudioContext..." },
+            { isOk: true,  text: "Sample Rate Target Set: 44.1kHz / 16-Bit Precision" },
+            { isOk: true,  text: "Master Bus Gain Node Linked to Hardware Output" },
+            { isOk: true,  text: "Biquad Bandpass Filter Node Configured for Mechanical Transient Emulation" },
+            { isOk: false, text: "Querying Browser Local Storage & Session State..." },
+            { isOk: true,  text: "Local Storage Key Matrix Initialized [kinzoku_term_state=0]" },
+            { isOk: false, text: "Fetching Kinzoku Labs Storefront Catalog Manifest..." },
+            { isOk: true,  text: "HTTP GET /api/v1/catalog/manifest.json -> 200 OK" },
+            { isOk: true,  text: "Parsed Category 01: [PCB Wearables & Circuit Board Jewelry]" },
+            { isOk: true,  text: "Parsed Category 02: [Custom Hardware Accessories & Relics]" },
+            { isOk: true,  text: "Etsy Direct Route Gateway Verified [External Redirect Engine Ready]" },
+            { isOk: false, text: "Loading Brand Lore & Hardware Schematics Index..." },
+            { isOk: true,  text: "Archive Entry 0x01: [Precision PCB Artwork & Soldermask Design]" },
+            { isOk: true,  text: "Archive Entry 0x02: [Custom Hardware Fabrication Philosophy]" },
+            { isOk: false, text: "Binding Hardware Event Listeners [Pointer / Keyboard Input]..." },
+            { isOk: true,  text: "Event Listeners Active [keydown, click, touchstart]" },
+            { isOk: true,  text: "GPU Acceleration Layer Binding Verified" },
+            { isOk: true,  text: "All Diagnostic Checks Cleared [0 System Faults]" },
+            { isOk: true,  text: "Transitioning Viewport to Main Terminal Engine..." }
+        ];
+
+        const logContainer = document.getElementById("boot-log");
+        const bootContainer = document.getElementById("boot-container");
+        const mainTerminal = document.getElementById("main-terminal");
+
+        let msgIndex = 0;
+
+        function printNextLine() {
+            if (msgIndex < siteBootMessages.length) {
+                const msg = siteBootMessages[msgIndex];
+                const lineDiv = document.createElement("div");
+                lineDiv.className = "log-line";
+
+                const realTime = getRealSeconds();
+                const prefixHTML = msg.isOk 
+                    ? `<span class="timestamp">[ ${realTime}s ]</span> [ <span class="status-ok">OK</span> ] `
+                    : `<span class="timestamp">[ ${realTime}s ]</span> `;
+
+                lineDiv.innerHTML = prefixHTML;
+                logContainer.appendChild(lineDiv);
+
+                const words = msg.text.split(" ");
+                let wordIndex = 0;
+
+                function printWord() {
+                    if (wordIndex < words.length) {
+                        const currentText = words.slice(0, wordIndex + 1).join(" ");
+                        lineDiv.innerHTML = prefixHTML + currentText;
+                        window.scrollTo(0, document.body.scrollHeight);
+
+                        playWordClick(); // Plays click strictly once per word printed
+
+                        wordIndex++;
+                        setTimeout(printWord, 60); 
+                    } else {
+                        msgIndex++;
+                        const lineDelay = msg.isOk ? 10 : 60; 
+                        setTimeout(printNextLine, lineDelay);
+                    }
+                }
+
+                printWord();
+            } else {
+                playBootBeep();
+
+                setTimeout(function() {
+                    bootContainer.style.display = "none";
+                    mainTerminal.style.display = "block";
+                    window.scrollTo(0, 0);
+                }, 400);
+            }
+        }
+
+        window.addEventListener("load", function() {
+            setTimeout(printNextLine, 300);
+        });
     </script>
 </body>
 </html>
