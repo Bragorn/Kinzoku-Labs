@@ -81,6 +81,10 @@
         }
 
         /* --- Boot Log Styles --- */
+        #boot-container {
+            display: block;
+        }
+
         .boot-log {
             display: flex;
             flex-direction: column;
@@ -145,13 +149,14 @@
         /* Animated Flashing Terminal Cursor */
         .cursor {
             display: inline-block;
-            width: 10px;
+            width: 100px;
             height: 1.2em;
             background-color: var(--amber-main);
             box-shadow: 0 0 8px var(--amber-glow);
             vertical-align: middle;
             margin-left: 4px;
             animation: blink 1s infinite;
+            width: 10px;
         }
 
         @keyframes blink {
@@ -162,12 +167,12 @@
 </head>
 <body>
 
-    <!-- SECTION 1: BOOT LOG (Runs first) -->
+    <!-- SECTION 1: BOOT LOG -->
     <div id="boot-container" class="terminal-container glow-text">
         <div id="boot-log" class="boot-log"></div>
     </div>
 
-    <!-- SECTION 2: MAIN TERMINAL (Revealed after boot) -->
+    <!-- SECTION 2: MAIN TERMINAL -->
     <div id="main-terminal" class="terminal-container glow-text">
         <div class="header-block">
             <div class="title">SYSTEM TERMINAL v1.0</div>
@@ -187,63 +192,58 @@
     </div>
 
     <script>
-        // Array of Boot Log Messages
-        const bootMessages = [
-            { time: "0.000000", text: "Linux version 6.1.0-custom-amber (gcc v12.2.0) #1 SMP PREEMPT" },
-            { time: "0.004120", text: "BIOS-provided physical RAM map:" },
-            { time: "0.004155", text: " BIOS-e820: [mem 0x0000000000000000-0x000000000009edff] usable" },
-            { time: "0.012401", text: "Console: colour dummy device 80x25" },
-            { time: "0.028910", text: "printk: console [tty0] enabled" },
-            { time: "0.089304", text: "Memory: 16384K/65536K available" },
-            { status: "OK", text: "Started Kernel Device Manager." },
-            { status: "OK", text: "Loaded CRT Display Driver [amber_crt.ko]." },
-            { status: "OK", text: "Activated Scanline Overlay Hardware Renderer." },
-            { status: "OK", text: "Mounted Root File System." },
-            { status: "OK", text: "Initialized Terminal Subsystem Interface." },
-            { status: "OK", text: "Reached target System Initialization." },
-            { status: "OK", text: "Launching Primary Interface..." }
-        ];
+        (function() {
+            const bootMessages = [
+                { time: "0.000000", text: "Linux version 6.1.0-custom-amber (gcc v12.2.0) #1 SMP PREEMPT" },
+                { time: "0.004120", text: "BIOS-provided physical RAM map:" },
+                { time: "0.004155", text: " BIOS-e820: [mem 0x0000000000000000-0x000000000009edff] usable" },
+                { time: "0.012401", text: "Console: colour dummy device 80x25" },
+                { time: "0.028910", text: "printk: console [tty0] enabled" },
+                { time: "0.089304", text: "Memory: 16384K/65536K available" },
+                { status: "OK", text: "Started Kernel Device Manager." },
+                { status: "OK", text: "Loaded CRT Display Driver [amber_crt.ko]." },
+                { status: "OK", text: "Activated Scanline Overlay Hardware Renderer." },
+                { status: "OK", text: "Mounted Root File System." },
+                { status: "OK", text: "Initialized Terminal Subsystem Interface." },
+                { status: "OK", text: "Reached target System Initialization." },
+                { status: "OK", text: "Launching Primary Interface..." }
+            ];
 
-        const logContainer = document.getElementById("boot-log");
-        const bootContainer = document.getElementById("boot-container");
-        const mainTerminal = document.getElementById("main-terminal");
+            const logContainer = document.getElementById("boot-log");
+            const bootContainer = document.getElementById("boot-container");
+            const mainTerminal = document.getElementById("main-terminal");
 
-        let index = 0;
+            let index = 0;
 
-        function printNextLine() {
-            if (index < bootMessages.length) {
-                const msg = bootMessages[index];
-                const lineDiv = document.createElement("div");
-                lineDiv.className = "log-line";
+            function printNextLine() {
+                if (index < bootMessages.length) {
+                    const msg = bootMessages[index];
+                    const lineDiv = document.createElement("div");
+                    lineDiv.className = "log-line";
 
-                if (msg.status) {
-                    lineDiv.innerHTML = `[ <span class="status-ok">${msg.status}</span> ] ${msg.text}`;
+                    if (msg.status) {
+                        lineDiv.innerHTML = `[ <span class="status-ok">${msg.status}</span> ] ${msg.text}`;
+                    } else {
+                        lineDiv.innerHTML = `<span class="timestamp">[${msg.time}]</span> ${msg.text}`;
+                    }
+
+                    logContainer.appendChild(lineDiv);
+                    index++;
+
+                    // 40ms delay per line
+                    setTimeout(printNextLine, 40);
                 } else {
-                    lineDiv.innerHTML = `<span class="timestamp">[${msg.time}]</span> ${msg.text}`;
+                    // Switch views after boot finishes
+                    setTimeout(function() {
+                        bootContainer.style.display = "none";
+                        mainTerminal.style.display = "block";
+                    }, 400);
                 }
-
-                logContainer.appendChild(lineDiv);
-                window.scrollTo(0, document.body.scrollHeight);
-
-                index++;
-
-                // Fast random line delay (15ms to 60ms)
-                const delay = Math.floor(Math.random() * 45) + 15;
-                setTimeout(printNextLine, delay);
-            } else {
-                // Transition: Wait 300ms, hide boot, show main terminal
-                setTimeout(() => {
-                    bootContainer.style.display = "none";
-                    mainTerminal.style.display = "block";
-                    window.scrollTo(0, 0);
-                }, 300);
             }
-        }
 
-        // Trigger boot sequence when page loads
-        window.addEventListener("DOMContentLoaded", () => {
-            setTimeout(printNextLine, 150);
-        });
+            // Execute immediately on script load
+            printNextLine();
+        })();
     </script>
 </body>
 </html>
