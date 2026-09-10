@@ -4,16 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KINZOKU LABS // TERMINAL</title>
+    
+    <!-- Cyberpunk Terminal Font Import -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-color: #080500;
-            --amber-main: #ffb000;
-            --amber-dim: #a67200;
-            --amber-glow: rgba(255, 176, 0, 0.35);
-            --ok-green: #55ff55;
-            --ok-glow: rgba(85, 255, 85, 0.35);
-            --alert-red: #ff3333;
-            --font-stack: 'Courier New', Courier, Monaco, 'SF Mono', monospace;
+            --bg-color: #08080a;
+            --text-main: #ffffff;
+            --text-dim: #7a7d94;
+            --text-glow: rgba(255, 255, 255, 0.22);
+            --ok-green: #00ff66;
+            --ok-glow: rgba(0, 255, 102, 0.25);
+            --font-cyber: 'Share Tech Mono', 'Courier New', monospace;
         }
 
         * {
@@ -24,8 +29,8 @@
 
         body {
             background-color: var(--bg-color);
-            color: var(--amber-main);
-            font-family: var(--font-stack);
+            color: var(--text-main);
+            font-family: var(--font-cyber);
             min-height: 100vh;
             padding: 24px;
             display: flex;
@@ -35,18 +40,18 @@
             position: relative;
         }
 
-        /* Ambient CRT Tube Glow */
+        /* Ambient CRT Edge Vignette */
         body::before {
             content: " ";
             display: block;
             position: fixed;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: radial-gradient(circle at 50% 50%, rgba(255, 176, 0, 0.04) 0%, rgba(0, 0, 0, 0.85) 100%);
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.015) 0%, rgba(0, 0, 0, 0.45) 100%);
             pointer-events: none;
             z-index: 1;
         }
 
-        /* Scanline Overlay */
+        /* Soft Scanline Overlay */
         body::after {
             content: " ";
             display: block;
@@ -54,7 +59,7 @@
             top: 0; left: 0; bottom: 0; right: 0;
             background: linear-gradient(
                 rgba(18, 16, 16, 0) 50%, 
-                rgba(0, 0, 0, 0.3) 50%
+                rgba(0, 0, 0, 0.18) 50%
             );
             background-size: 100% 4px;
             pointer-events: none;
@@ -64,53 +69,26 @@
         .terminal-container {
             position: relative;
             z-index: 3;
-            max-width: 900px;
+            max-width: 950px;
             width: 100%;
             margin: 0 auto;
         }
 
         .glow-text {
-            color: var(--amber-main);
+            color: var(--text-main);
             text-shadow: 
-                0 0 2px var(--amber-main),
-                0 0 6px var(--amber-glow);
-            line-height: 1.5;
-            font-size: 0.92rem;
+                0 0 2px var(--text-main),
+                0 0 5px var(--text-glow);
+            line-height: 1.45;
+            font-size: 0.95rem;
             letter-spacing: 0.5px;
-        }
-
-        #audio-prompt {
-            color: var(--alert-red);
-            background: rgba(255, 51, 51, 0.1);
-            border: 1px dashed var(--alert-red);
-            padding: 10px 14px;
-            font-size: 0.8rem;
-            margin-bottom: 20px;
-            letter-spacing: 1px;
-            cursor: pointer;
-            user-select: none;
-            text-align: center;
-            transition: all 0.2s ease;
-            animation: pulse-border 1.5s infinite;
-        }
-
-        @keyframes pulse-border {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        #audio-prompt.unlocked {
-            color: var(--ok-green);
-            background: rgba(85, 255, 85, 0.08);
-            border-color: var(--ok-green);
-            animation: none;
         }
 
         .boot-log {
             display: flex;
             flex-direction: column;
-            gap: 3px;
-            font-size: 0.85rem;
+            gap: 2px;
+            font-size: 0.88rem;
             padding-bottom: 40px;
         }
 
@@ -125,9 +103,14 @@
             font-weight: bold;
         }
 
+        .status-pad {
+            display: inline-block;
+            width: 72px;
+        }
+
         .timestamp {
-            color: var(--amber-dim);
-            margin-right: 8px;
+            color: var(--text-dim);
+            margin-right: 10px;
         }
 
         #main-terminal {
@@ -136,21 +119,23 @@
 
         .header-block {
             margin-bottom: 24px;
-            border-bottom: 1px dashed var(--amber-dim);
+            border-bottom: 1px dashed var(--text-dim);
             padding-bottom: 16px;
         }
 
         .title {
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             font-weight: bold;
             margin-bottom: 6px;
-            letter-spacing: 2.5px;
+            letter-spacing: 3px;
+            min-height: 1.8rem;
         }
 
         .sub-title {
-            color: var(--amber-dim);
-            font-size: 0.88rem;
+            color: var(--text-dim);
+            font-size: 0.9rem;
             letter-spacing: 1px;
+            min-height: 1rem;
         }
 
         .content-block {
@@ -161,35 +146,39 @@
         }
 
         .description {
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             line-height: 1.6;
+            min-height: 1.2rem;
         }
 
         .tagline {
-            color: var(--amber-dim);
-            font-size: 0.88rem;
+            color: var(--text-dim);
+            font-size: 0.9rem;
             font-style: italic;
+            min-height: 1rem;
         }
 
         .prompt-line {
             display: flex;
             align-items: center;
             margin-top: 24px;
-            border-top: 1px dashed var(--amber-dim);
+            border-top: 1px dashed var(--text-dim);
             padding-top: 16px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
         }
 
         .prompt-symbol {
             margin-right: 8px;
-            color: var(--amber-main);
+            color: var(--text-main);
         }
 
         .cursor {
             display: inline-block;
             width: 10px;
             height: 1.2em;
-            background-color: var(--amber-main);
-            box-shadow: 0 0 8px var(--amber-glow);
+            background-color: var(--text-main);
+            box-shadow: 0 0 6px var(--text-glow);
             vertical-align: middle;
             margin-left: 4px;
             animation: blink 1s infinite;
@@ -204,201 +193,171 @@
 <body>
 
     <div id="boot-container" class="terminal-container glow-text">
-        <div id="audio-prompt">[ CLICK HERE TO UNLOCK AUDIO RELAYS & HEARING SOUNDS ]</div>
         <div id="boot-log" class="boot-log"></div>
     </div>
 
     <div id="main-terminal" class="terminal-container glow-text">
         <div class="header-block">
-            <div class="title">KINZOKU LABS</div>
-            <div class="sub-title">STATUS: SYSTEM ONLINE // ARCHIVE ACCESS GRANTED</div>
+            <div class="title" id="type-title"></div>
+            <div class="sub-title" id="type-subtitle"></div>
         </div>
 
         <div class="content-block">
-            <p class="description">> SPECIALIZING IN CUSTOM CIRCUIT BOARD JEWELRY AND HARDWARE ACCESSORIES.</p>
-            <p class="tagline">// PRECISION PCB FABRICATION. HARDWARE AS ART.</p>
+            <p class="description" id="type-desc"></p>
+            <p class="tagline" id="type-tagline"></p>
         </div>
 
-        <div class="prompt-line">
+        <div class="prompt-line" id="prompt-block">
             <span class="prompt-symbol">></span>
-            <span>AWAITING INPUT...</span>
+            <span id="type-prompt"></span>
             <span class="cursor"></span>
         </div>
     </div>
 
-    <script>
-        const bootStartTime = performance.now();
+<script>
+    const bootStartTime = performance.now();
 
-        function getRealSeconds() {
-            const elapsed = performance.now() - bootStartTime;
-            return (elapsed / 1000).toFixed(6);
-        }
+    function getRealSeconds() {
+        const elapsed = performance.now() - bootStartTime;
+        return (elapsed / 1000).toFixed(3);
+    }
 
-        // --- AUDIBLE TACTILE MECHANICAL CLICK SYNTHESIZER ---
-        let audioCtx = null;
+    // 1. Detect device type & entry point
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || ('ontouchstart' in window);
+    const urlParams = new URLSearchParams(window.location.search);
+    const isQRSource = urlParams.get('src') === 'qr' || isMobileDevice;
 
-        function initAudio() {
-            if (!audioCtx) {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (AudioContext) audioCtx = new AudioContext();
-            }
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            
-            const promptEl = document.getElementById("audio-prompt");
-            if (promptEl) {
-                promptEl.classList.add("unlocked");
-                promptEl.innerHTML = "[ AUDIO RELAYS ONLINE // TACTILE CLICK ENGINE ACTIVE ]";
-            }
-        }
+    // 2. Dynamic initial boot entries
+    const initialEntryLog = isQRSource ? [
+        { isOk: false, text: "QR URI MATRIX DECODED [TARGET: KINZOKU LABS WEB ENTRY]" },
+        { isOk: false, text: "MOBILE VIEWPORT & TOUCH MATRIX DETECTED..." }
+    ] : [
+        { isOk: false, text: "DIRECT HTTP REQUEST RECEIVED [TARGET: KINZOKU LABS WEB ENTRY]" },
+        { isOk: false, text: "DESKTOP VIEWPORT & POINTER DEVICE DETECTED..." }
+    ];
 
-        // Tactile micro-burst click engine
-        function playWordClick() {
-            if (!audioCtx || audioCtx.state !== 'running') return;
+    // 3. Complete browser pipeline log
+    const siteBootMessages = [
+        ...initialEntryLog,
+        { isOk: false, text: "Initiating HTTP/3 QUIC connection handshake..." },
+        { isOk: true,  text: "TLS 1.3 session established [ChaCha20-Poly1305 Cipher Suite]" },
+        { isOk: true,  text: "OCSP Stapling Verified: SSL Certificate Active" },
+        { isOk: false, text: "Inspecting client browser capabilities & environment..." },
+        { isOk: true,  text: "Viewport parameters bound: High-DPI Matrix Active" },
+        { isOk: true,  text: "Device pixel ratio & screen color gamut initialized" },
+        { isOk: true,  text: "Hardware input listeners attached: Pointer, Touch & Keyboard" },
+        { isOk: false, text: "Downloading primary HTML5 document stream..." },
+        { isOk: true,  text: "HTTP GET / -> 200 OK [Content-Type: text/html]" },
+        { isOk: false, text: "Parsing HTML token stream -> Constructing DOM tree..." },
+        { isOk: true,  text: "DOM structure verified [#boot-container, #main-terminal]" },
+        { isOk: false, text: "Downloading & compiling CSS stylesheet engine..." },
+        { isOk: true,  text: "CSS custom variables bound (--bg-color, --text-main, --ok-green)" },
+        { isOk: true,  text: "Constructing CSSOM & calculating render tree layout" },
+        { isOk: true,  text: "Compositor layers initialized for smooth hardware rendering" },
+        { isOk: true,  text: "Phosphor CRT scanline shader & subpixel filtering applied" },
+        { isOk: false, text: "Requesting webfont resources..." },
+        { isOk: true,  text: "WebFont 'Share Tech Mono' (WOFF2) loaded & bound" },
+        { isOk: false, text: "Initializing JavaScript execution runtime..." },
+        { isOk: false, text: "Checking SessionStorage & LocalStorage state..." },
+        { isOk: true,  text: "Client session storage keys validated" },
+        { isOk: false, text: "Fetching storefront content index manifest..." },
+        { isOk: true,  text: "HTTP GET /api/v1/catalog/manifest.json -> 200 OK" },
+        { isOk: true,  text: "Catalog manifest payload parsed [Storefront categories ready]" },
+        { isOk: false, text: "Hydrating Document Object Model (DOM)..." },
+        { isOk: true,  text: "DOM hydration complete [0 unhandled events]" },
+        { isOk: false, text: "Executing browser garbage collection memory sweep..." },
+        { isOk: true,  text: "Memory allocation nominal [0 leaks detected]" },
+        { isOk: true,  text: "All browser client boot checks passed" },
+        { isOk: true,  text: "Handoff to main interactive terminal interface..." }
+    ];
 
-            const now = audioCtx.currentTime;
+    const logContainer = document.getElementById("boot-log");
+    const bootContainer = document.getElementById("boot-container");
+    const mainTerminal = document.getElementById("main-terminal");
 
-            // Generate noise burst for realistic relay impact
-            const bufferSize = audioCtx.sampleRate * 0.008; // 8ms transient
-            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
+    // TIMING CONSTANTS
+    const WORD_SPEED_MS = 24;    
+    const OK_LINE_DELAY = 90;    
+    const INFO_LINE_DELAY = 45;  
+    const FINAL_PAUSE_MS = 1800; 
+    const TYPE_CHAR_SPEED = 6;   
 
-            const noise = audioCtx.createBufferSource();
-            noise.buffer = buffer;
+    let msgIndex = 0;
 
-            // Filter the noise to sound like a solid plastic key housing strike
-            const filter = audioCtx.createBiquadFilter();
-            filter.type = 'bandpass';
-            filter.frequency.setValueAtTime(1800 + (Math.random() * 200 - 100), now);
-            filter.Q.setValueAtTime(3.0, now);
+    function printNextLine() {
+        if (msgIndex < siteBootMessages.length) {
+            const msg = siteBootMessages[msgIndex];
+            const lineDiv = document.createElement("div");
+            lineDiv.className = "log-line";
 
-            const gain = audioCtx.createGain();
-            gain.gain.setValueAtTime(0.08, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.008);
+            const realTime = getRealSeconds();
+            const prefixHTML = msg.isOk 
+                ? `<span class="status-pad">[ <span class="status-ok">OK</span> ]</span><span class="timestamp">[ ${realTime}s ]</span>`
+                : `<span class="status-pad"></span><span class="timestamp">[ ${realTime}s ]</span>`;
 
-            noise.connect(filter);
-            filter.connect(gain);
-            gain.connect(audioCtx.destination);
+            lineDiv.innerHTML = prefixHTML;
+            logContainer.appendChild(lineDiv);
 
-            noise.start(now);
-        }
+            const words = msg.text.split(" ");
+            let wordIndex = 0;
 
-        function playBootBeep() {
-            if (!audioCtx || audioCtx.state !== 'running') return;
+            function printWord() {
+                if (wordIndex < words.length) {
+                    const currentText = words.slice(0, wordIndex + 1).join(" ");
+                    lineDiv.innerHTML = prefixHTML + currentText;
+                    window.scrollTo(0, document.body.scrollHeight);
 
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(880, now);
-            gain.gain.setValueAtTime(0.04, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start(now);
-            osc.stop(now + 0.12);
-        }
-
-        window.addEventListener('click', initAudio);
-        window.addEventListener('keydown', initAudio);
-
-        // --- REALISTIC WEBSITE BOOT LOG ---
-        const siteBootMessages = [
-            { isOk: false, text: "KINZOKU LABS ARCHIVE SYSTEM v1.0.4" },
-            { isOk: false, text: "Initializing HTTP/2 Network Session Layer..." },
-            { isOk: true,  text: "DNS Lookup Resolved: kinzokulabs.com -> 127.0.0.1" },
-            { isOk: true,  text: "TLS 1.3 Handshake Completed [ECDHE-RSA-AES128-GCM-SHA256]" },
-            { isOk: false, text: "Allocating User Agent Viewport Bounds..." },
-            { isOk: true,  text: "Viewport Initialized: Device Pixel Ratio [1.0x]" },
-            { isOk: false, text: "Parsing HTML5 Document Markup Tree..." },
-            { isOk: true,  text: "DOM Node Allocation Complete [body, #boot-container, #main-terminal]" },
-            { isOk: false, text: "Compiling Cascading Style Sheets (CSSOM)..." },
-            { isOk: true,  text: "Root CSS Custom Variables Extracted (--amber-main, --amber-glow)" },
-            { isOk: true,  text: "Applying CRT Scanline Fragment Shader Layer" },
-            { isOk: true,  text: "Applying Phosphor Tube Radial Glow Gradient" },
-            { isOk: false, text: "Auditing System Typography Stack..." },
-            { isOk: true,  text: "Fixed-Width Monospace Font Engine Active [Courier New Fallback]" },
-            { isOk: false, text: "Initializing Web Audio API AudioContext..." },
-            { isOk: true,  text: "Sample Rate Target Set: 44.1kHz / 16-Bit Precision" },
-            { isOk: true,  text: "Master Bus Gain Node Linked to Hardware Output" },
-            { isOk: true,  text: "Biquad Bandpass Filter Node Configured for Mechanical Transient Emulation" },
-            { isOk: false, text: "Querying Browser Local Storage & Session State..." },
-            { isOk: true,  text: "Local Storage Key Matrix Initialized [kinzoku_term_state=0]" },
-            { isOk: false, text: "Fetching Kinzoku Labs Storefront Catalog Manifest..." },
-            { isOk: true,  text: "HTTP GET /api/v1/catalog/manifest.json -> 200 OK" },
-            { isOk: true,  text: "Parsed Category 01: [PCB Wearables & Circuit Board Jewelry]" },
-            { isOk: true,  text: "Parsed Category 02: [Custom Hardware Accessories & Relics]" },
-            { isOk: true,  text: "Etsy Direct Route Gateway Verified [External Redirect Engine Ready]" },
-            { isOk: false, text: "Loading Brand Lore & Hardware Schematics Index..." },
-            { isOk: true,  text: "Archive Entry 0x01: [Precision PCB Artwork & Soldermask Design]" },
-            { isOk: true,  text: "Archive Entry 0x02: [Custom Hardware Fabrication Philosophy]" },
-            { isOk: false, text: "Binding Hardware Event Listeners [Pointer / Keyboard Input]..." },
-            { isOk: true,  text: "Event Listeners Active [keydown, click, touchstart]" },
-            { isOk: true,  text: "GPU Acceleration Layer Binding Verified" },
-            { isOk: true,  text: "All Diagnostic Checks Cleared [0 System Faults]" },
-            { isOk: true,  text: "Transitioning Viewport to Main Terminal Engine..." }
-        ];
-
-        const logContainer = document.getElementById("boot-log");
-        const bootContainer = document.getElementById("boot-container");
-        const mainTerminal = document.getElementById("main-terminal");
-
-        let msgIndex = 0;
-
-        function printNextLine() {
-            if (msgIndex < siteBootMessages.length) {
-                const msg = siteBootMessages[msgIndex];
-                const lineDiv = document.createElement("div");
-                lineDiv.className = "log-line";
-
-                const realTime = getRealSeconds();
-                const prefixHTML = msg.isOk 
-                    ? `<span class="timestamp">[ ${realTime}s ]</span> [ <span class="status-ok">OK</span> ] `
-                    : `<span class="timestamp">[ ${realTime}s ]</span> `;
-
-                lineDiv.innerHTML = prefixHTML;
-                logContainer.appendChild(lineDiv);
-
-                const words = msg.text.split(" ");
-                let wordIndex = 0;
-
-                function printWord() {
-                    if (wordIndex < words.length) {
-                        const currentText = words.slice(0, wordIndex + 1).join(" ");
-                        lineDiv.innerHTML = prefixHTML + currentText;
-                        window.scrollTo(0, document.body.scrollHeight);
-
-                        playWordClick(); // Plays click strictly once per word printed
-
-                        wordIndex++;
-                        setTimeout(printWord, 60); 
-                    } else {
-                        msgIndex++;
-                        const lineDelay = msg.isOk ? 10 : 60; 
-                        setTimeout(printNextLine, lineDelay);
-                    }
+                    wordIndex++;
+                    setTimeout(printWord, WORD_SPEED_MS);
+                } else {
+                    msgIndex++;
+                    const lineDelay = msg.isOk ? OK_LINE_DELAY : INFO_LINE_DELAY; 
+                    setTimeout(printNextLine, lineDelay);
                 }
+            }
 
-                printWord();
-            } else {
-                playBootBeep();
+            printWord();
+        } else {
+            setTimeout(startMainTerminal, FINAL_PAUSE_MS);
+        }
+    }
 
-                setTimeout(function() {
-                    bootContainer.style.display = "none";
-                    mainTerminal.style.display = "block";
-                    window.scrollTo(0, 0);
-                }, 400);
+    function typeText(elementId, text, speed, callback) {
+        const el = document.getElementById(elementId);
+        let charIndex = 0;
+
+        function step() {
+            if (charIndex < text.length) {
+                el.textContent += text.charAt(charIndex);
+                charIndex++;
+                setTimeout(step, speed);
+            } else if (callback) {
+                setTimeout(callback, 80);
             }
         }
+        step();
+    }
 
-        window.addEventListener("load", function() {
-            setTimeout(printNextLine, 300);
+    function startMainTerminal() {
+        bootContainer.style.display = "none";
+        mainTerminal.style.display = "block";
+        window.scrollTo(0, 0);
+
+        typeText("type-title", "KINZOKU LABS", TYPE_CHAR_SPEED, () => {
+            typeText("type-subtitle", "STATUS: SYSTEM ONLINE // ACCESS GRANTED", TYPE_CHAR_SPEED, () => {
+                typeText("type-desc", "> SPECIALIZING IN CUSTOM CIRCUIT BOARD JEWELRY AND HARDWARE ACCESSORIES.", TYPE_CHAR_SPEED, () => {
+                    typeText("type-tagline", "// PRECISION PCB FABRICATION. HARDWARE AS ART.", TYPE_CHAR_SPEED, () => {
+                        document.getElementById("prompt-block").style.opacity = "1";
+                        typeText("type-prompt", "AWAITING INPUT...", TYPE_CHAR_SPEED);
+                    });
+                });
+            });
         });
-    </script>
+    }
+
+    window.addEventListener("load", function() {
+        setTimeout(printNextLine, 250);
+    });
+</script>
 </body>
 </html>
